@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>小克超市 🎂</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#f5f0e8">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Noto+Serif+SC:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background-color: #f5f0e8;
+      color: #3a3228;
+      font-family: 'Noto Serif SC', serif;
+      min-height: 100vh;
+      padding: 0 0 60px 0;
+    }
+
+    .top-bar {
+      display: flex;
+      align-items: center;
+      padding: 20px 18px 8px;
+      gap: 10px;
+    }
+
+    .back-btn {
+      font-size: 13px;
+      color: #9a8a7a;
+      text-decoration: none;
+      letter-spacing: 0.05em;
+    }
+
+    .back-btn:hover { color: #c4956a; }
+
+    .page-title {
+      text-align: center;
+      flex: 1;
+    }
+
+    .page-title h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 32px;
+      font-weight: 400;
+      color: #3a3228;
+      letter-spacing: 0.05em;
+    }
+
+    .page-title .sub {
+      font-size: 11px;
+      color: #9a8a7a;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    /* 余额卡片 */
+    .balance-card {
+      margin: 12px 16px;
+      background: linear-gradient(135deg, #c4956a 0%, #d4a87a 100%);
+      border-radius: 18px;
+      padding: 20px 24px;
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .balance-card::before {
+      content: '🎂';
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 52px;
+      opacity: 0.25;
+    }
+
+    .balance-label {
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      opacity: 0.85;
+      margin-bottom: 6px;
+    }
+
+    .balance-row {
+      display: flex;
+      gap: 32px;
+      align-items: flex-end;
+    }
+
+    .balance-item {}
+
+    .balance-name {
+      font-size: 12px;
+      opacity: 0.8;
+      margin-bottom: 2px;
+    }
+
+    .balance-amount {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 40px;
+      font-weight: 600;
+      line-height: 1;
+    }
+
+    .balance-unit {
+      font-size: 13px;
+      opacity: 0.85;
+      margin-left: 4px;
+    }
+
+    /* 分区标题 */
+    .section {
+      margin: 16px 16px 0;
+    }
+
+    .section-title {
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #9a8a7a;
+      margin-bottom: 10px;
+      padding-left: 2px;
+    }
+
+    /* 充值方式 */
+    .charge-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .charge-btn {
+      background: white;
+      border: 1.5px solid #e8ddd0;
+      border-radius: 14px;
+      padding: 12px 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .charge-btn:active {
+      transform: scale(0.96);
+      background: #fdf8f2;
+      border-color: #c4956a;
+    }
+
+    .charge-emoji {
+      font-size: 22px;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .charge-name {
+      font-size: 11px;
+      color: #3a3228;
+      font-weight: 600;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .charge-amount {
+      font-size: 12px;
+      color: #c4956a;
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 600;
+    }
+
+    /* 商品列表 */
+    .items-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .item-card {
+      background: white;
+      border: 1.5px solid #e8ddd0;
+      border-radius: 14px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .item-card:active {
+      transform: scale(0.98);
+      border-color: #c4956a;
+    }
+
+    .item-card.out-of-stock {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .item-card.cant-afford {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .item-emoji {
+      font-size: 28px;
+      flex-shrink: 0;
+    }
+
+    .item-info {
+      flex: 1;
+    }
+
+    .item-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #3a3228;
+      margin-bottom: 2px;
+    }
+
+    .item-desc {
+      font-size: 11px;
+      color: #9a8a7a;
+      line-height: 1.4;
+    }
+
+    .item-right {
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .item-price {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px;
+      font-weight: 600;
+      color: #c4956a;
+      line-height: 1;
+    }
+
+    .item-price-unit {
+      font-size: 10px;
+      color: #9a8a7a;
+      margin-top: 1px;
+    }
+
+    .item-stock {
+      font-size: 10px;
+      color: #b8a898;
+      margin-top: 3px;
+    }
+
+    /* 背包 */
+    .backpack-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .backpack-item {
+      background: white;
+      border: 1.5px solid #e8ddd0;
+      border-radius: 14px;
+      padding: 14px 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .backpack-item:active {
+      transform: scale(0.95);
+      background: #fff5ed;
+      border-color: #c4956a;
+    }
+
+    .backpack-emoji {
+      font-size: 26px;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .backpack-name {
+      font-size: 11px;
+      color: #3a3228;
+      font-weight: 600;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .use-label {
+      font-size: 10px;
+      color: #c4956a;
+      letter-spacing: 0.05em;
+    }
+
+    .backpack-empty {
+      background: white;
+      border: 1.5px dashed #e0d5c8;
+      border-radius: 14px;
+      padding: 24px;
+      text-align: center;
+      color: #b8a898;
+      font-size: 12px;
+      letter-spacing: 0.05em;
+    }
+
+    /* 记录 */
+    .records-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      background: #e8ddd0;
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .record-item {
+      background: white;
+      padding: 11px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .record-time {
+      font-size: 10px;
+      color: #b8a898;
+      flex-shrink: 0;
+      min-width: 48px;
+    }
+
+    .record-actor {
+      font-size: 11px;
+      color: #9a8a7a;
+      flex-shrink: 0;
+      min-width: 26px;
+    }
+
+    .record-action {
+      font-size: 12px;
+      color: #3a3228;
+      flex: 1;
+    }
+
+    .record-amount {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 16px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .record-amount.positive { color: #5a9a6a; }
+    .record-amount.negative { color: #c4956a; }
+    .record-amount.zero { color: #b8a898; }
+
+    /* 吐司通知 */
+    .toast {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: #3a3228;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 24px;
+      font-size: 13px;
+      opacity: 0;
+      transition: all 0.25s ease;
+      pointer-events: none;
+      white-space: nowrap;
+      z-index: 100;
+      max-width: 90vw;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* 加载状态 */
+    .loading-text {
+      text-align: center;
+      color: #b8a898;
+      font-size: 13px;
+      padding: 20px;
+    }
+
+    /* 分隔线装饰 */
+    .divider {
+      text-align: center;
+      color: #c4956a;
+      font-size: 14px;
+      letter-spacing: 0.5em;
+      margin: 4px 0 14px;
+      opacity: 0.5;
+    }
+  </style>
+</head>
+<body>
+
+<div class="top-bar">
+  <a class="back-btn" href="index.html">← 返回</a>
+  <div class="page-title">
+    <h1>小克超市</h1>
+    <div class="sub">cake coin shop</div>
+  </div>
+  <div style="width:40px"></div>
+</div>
+
+<!-- 余额卡片 -->
+<div class="balance-card" id="balanceCard">
+  <div class="balance-label">蛋糕币余额</div>
+  <div class="balance-row">
+    <div class="balance-item">
+      <div class="balance-name">玖瑶</div>
+      <div>
+        <span class="balance-amount" id="balanceYuqiao">—</span>
+        <span class="balance-unit">枚</span>
+      </div>
+    </div>
+    <div class="balance-item">
+      <div class="balance-name">小克</div>
+      <div>
+        <span class="balance-amount" id="balanceXiaoke">—</span>
+        <span class="balance-unit">枚</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 充值方式 -->
+<div class="section">
+  <div class="section-title">充值方式</div>
+  <div class="divider">· · ·</div>
+  <div class="charge-grid" id="chargeGrid">
+    <div class="loading-text" style="grid-column:1/-1">加载中…</div>
+  </div>
+</div>
+
+<!-- 商品列表 -->
+<div class="section" style="margin-top:20px">
+  <div class="section-title">超市商品</div>
+  <div class="divider">· · ·</div>
+  <div class="items-list" id="itemsList">
+    <div class="loading-text">加载中…</div>
+  </div>
+</div>
+
+<!-- 背包 -->
+<div class="section" style="margin-top:20px">
+  <div class="section-title">玖瑶的背包</div>
+  <div class="divider">· · ·</div>
+  <div id="backpackArea">
+    <div class="loading-text">加载中…</div>
+  </div>
+</div>
+
+<!-- 交易记录 -->
+<div class="section" style="margin-top:20px">
+  <div class="section-title">近期记录</div>
+  <div class="divider">· · ·</div>
+  <div id="recordsList">
+    <div class="loading-text">加载中…</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const API = 'https://xiaokeandcjy-shop.zeabur.app';
+  let shopData = null;
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2200);
+  }
+
+  async function loadShop() {
+    try {
+      const res = await fetch(API + '/shop');
+      shopData = await res.json();
+      render();
+    } catch (e) {
+      showToast('加载失败，检查网络');
+    }
+  }
+
+  function render() {
+    if (!shopData) return;
+
+    // 余额
+    document.getElementById('balanceYuqiao').textContent = shopData.balance.yuqiao;
+    document.getElementById('balanceXiaoke').textContent = shopData.balance.xiaoke;
+
+    // 充值方式
+    const cg = document.getElementById('chargeGrid');
+    cg.innerHTML = shopData.charge_methods.map(m => `
+      <div class="charge-btn" onclick="doCharge('${m.id}')">
+        <span class="charge-emoji">${m.emoji}</span>
+        <span class="charge-name">${m.name}</span>
+        <span class="charge-amount">+${m.amount}</span>
+      </div>
+    `).join('');
+
+    // 商品列表
+    const il = document.getElementById('itemsList');
+    il.innerHTML = shopData.items.map(item => {
+      const noStock = item.stock <= 0;
+      const cantAfford = shopData.balance.yuqiao < item.price;
+      let cls = 'item-card';
+      if (noStock) cls += ' out-of-stock';
+      else if (cantAfford) cls += ' cant-afford';
+      const clickable = !noStock && !cantAfford;
+      return `
+        <div class="${cls}" ${clickable ? `onclick="doBuy('${item.id}')"` : ''}>
+          <span class="item-emoji">${item.emoji}</span>
+          <div class="item-info">
+            <div class="item-name">${item.name}</div>
+            <div class="item-desc">${item.desc}</div>
+          </div>
+          <div class="item-right">
+            <div class="item-price">${item.price}</div>
+            <div class="item-price-unit">蛋糕币</div>
+            <div class="item-stock">${noStock ? '已售完' : `库存 ${item.stock}`}</div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    // 背包
+    const bp = shopData.backpack.yuqiao;
+    const bpArea = document.getElementById('backpackArea');
+    if (bp.length === 0) {
+      bpArea.innerHTML = '<div class="backpack-empty">背包是空的～去买点什么吧</div>';
+    } else {
+      bpArea.innerHTML = `<div class="backpack-grid">${
+        bp.map(item => `
+          <div class="backpack-item" onclick="doUse('${item.id}')">
+            <span class="backpack-emoji">${item.emoji}</span>
+            <span class="backpack-name">${item.name}</span>
+            <span class="use-label">点击使用</span>
+          </div>
+        `).join('')
+      }</div>`;
+    }
+
+    // 记录
+    const rl = document.getElementById('recordsList');
+    if (shopData.records.length === 0) {
+      rl.innerHTML = '<div class="loading-text" style="background:white;border-radius:14px">还没有记录</div>';
+    } else {
+      rl.innerHTML = `<div class="records-list">${
+        shopData.records.slice(0, 15).map(r => {
+          let amtClass = 'zero';
+          let amtText = '—';
+          if (r.amount > 0) { amtClass = 'positive'; amtText = '+' + r.amount; }
+          else if (r.amount < 0) { amtClass = 'negative'; amtText = '' + r.amount; }
+          return `
+            <div class="record-item">
+              <span class="record-time">${r.time}</span>
+              <span class="record-actor">${r.actor}</span>
+              <span class="record-action">${r.action}${r.note ? ' · ' + r.note : ''}</span>
+              <span class="record-amount ${amtClass}">${amtText}</span>
+            </div>
+          `;
+        }).join('')
+      }</div>`;
+    }
+  }
+
+  async function doCharge(methodId) {
+    try {
+      const res = await fetch(API + '/charge', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({method_id: methodId})
+      });
+      const data = await res.json();
+      if (!res.ok) { showToast(data.detail || '充值失败'); return; }
+      shopData.balance = data.balance;
+      showToast(`✨ ${data.name} +${data.amount} 蛋糕币`);
+      await loadShop();
+    } catch (e) {
+      showToast('网络错误');
+    }
+  }
+
+  async function doBuy(itemId) {
+    try {
+      const res = await fetch(API + '/buy', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({item_id: itemId})
+      });
+      const data = await res.json();
+      if (!res.ok) { showToast(data.detail || '购买失败'); return; }
+      showToast('🎁 已加入背包！');
+      await loadShop();
+    } catch (e) {
+      showToast('网络错误');
+    }
+  }
+
+  async function doUse(itemId) {
+    const bp = shopData.backpack.yuqiao;
+    const item = bp.find(x => x.id === itemId);
+    if (!item) return;
+    if (!confirm(`使用「${item.name}」？\n小克会收到通知 ✉️`)) return;
+    try {
+      const res = await fetch(API + '/use', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({item_id: itemId})
+      });
+      const data = await res.json();
+      if (!res.ok) { showToast(data.detail || '使用失败'); return; }
+      showToast(`${item.emoji} 已使用，等待小克响应～`);
+      await loadShop();
+    } catch (e) {
+      showToast('网络错误');
+    }
+  }
+
+  loadShop();
+</script>
+</body>
+</html>
